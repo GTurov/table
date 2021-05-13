@@ -3,6 +3,7 @@
 #include "FormulaBaseListener.h"
 #include "FormulaLexer.h"
 #include "FormulaParser.h"
+#include "common.h"
 
 #include <cassert>
 #include <cmath>
@@ -145,6 +146,22 @@ public:
 // Реализуйте метод Evaluate() для бинарных операций.
 // При делении на 0 выбрасывайте ошибку вычисления FormulaError
     double Evaluate() const override {
+        switch (type_) {
+        case Add:
+            return lhs_->Evaluate() + rhs_->Evaluate();
+        case Subtract:
+            return lhs_->Evaluate() - rhs_->Evaluate();
+        case Multiply:
+            return lhs_->Evaluate() * rhs_->Evaluate();
+        case Divide: {
+            if (rhs_->Evaluate() == 0) {
+                throw FormulaError("DIV/0");
+            }
+            return lhs_->Evaluate() / rhs_->Evaluate();
+        }
+        default:
+            throw FormulaError("Unknown operation");
+        }
     }
 
 private:
@@ -183,6 +200,14 @@ public:
 
 // Реализуйте метод Evaluate() для унарных операций.
     double Evaluate() const override {
+        switch (type_) {
+        case UnaryPlus:
+            return operand_->Evaluate();
+        case UnaryMinus:
+            return -operand_->Evaluate();
+        default:
+            throw FormulaError("Unknown operation");
+        }
     }
 
 private:

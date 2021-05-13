@@ -26,7 +26,7 @@ set(ANTLR_EXECUTABLE $ENV{ANTLR_EXECUTABLE})
 include(${CMAKE_CURRENT_SOURCE_DIR}/FindANTLR.cmake)
 add_subdirectory(antlr4_runtime)
 
-antlr_target(FormulaParser Formula.g4 LEXER PARSER LISTENER)
+#antlr_target(FormulaParser Formula.g4 LEXER PARSER LISTENER)
 
 include_directories(
         ${ANTLR4_INCLUDE_DIRS}

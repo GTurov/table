@@ -25,59 +25,59 @@ namespace TestRunnerPrivate {
   }
 }
 
-//template <class T>
-//std::ostream& operator<<(std::ostream& os, const std::vector<T>& s) {
-//  os << "{";
-//  bool first = true;
-//  for (const auto& x : s) {
-//    if (!first) {
-//      os << ", ";
-//    }
-//    first = false;
-//    os << x;
-//  }
-//  return os << "}";
-//}
+template <class T>
+std::ostream& operator<<(std::ostream& os, const std::vector<T>& s) {
+  os << "{";
+  bool first = true;
+  for (const auto& x : s) {
+    if (!first) {
+      os << ", ";
+    }
+    first = false;
+    os << x;
+  }
+  return os << "}";
+}
 
-//template <class T>
-//std::ostream& operator<<(std::ostream& os, const std::set<T>& s) {
-//  os << "{";
-//  bool first = true;
-//  for (const auto& x : s) {
-//    if (!first) {
-//      os << ", ";
-//    }
-//    first = false;
-//    os << x;
-//  }
-//  return os << "}";
-//}
+template <class T>
+std::ostream& operator<<(std::ostream& os, const std::set<T>& s) {
+  os << "{";
+  bool first = true;
+  for (const auto& x : s) {
+    if (!first) {
+      os << ", ";
+    }
+    first = false;
+    os << x;
+  }
+  return os << "}";
+}
 
-//template <class K, class V>
-//std::ostream& operator<<(std::ostream& os, const std::map<K, V>& m) {
-//  return TestRunnerPrivate::PrintMap(os, m);
-//}
+template <class K, class V>
+std::ostream& operator<<(std::ostream& os, const std::map<K, V>& m) {
+  return TestRunnerPrivate::PrintMap(os, m);
+}
 
-//template <class K, class V>
-//std::ostream& operator<<(std::ostream& os, const std::unordered_map<K, V>& m) {
-//  return TestRunnerPrivate::PrintMap(os, m);
-//}
+template <class K, class V>
+std::ostream& operator<<(std::ostream& os, const std::unordered_map<K, V>& m) {
+  return TestRunnerPrivate::PrintMap(os, m);
+}
 
-//template <class T, class U>
-//void AssertEqual(const T& t, const U& u, const std::string& hint = {}) {
-//  if (!(t == u)) {
-//    std::ostringstream os;
-//    os << "Assertion failed: " << t << " != " << u;
-//    if (!hint.empty()) {
-//      os << " hint: " << hint;
-//    }
-//    throw std::runtime_error(os.str());
-//  }
-//}
+template <class T, class U>
+void AssertEqual(const T& t, const U& u, const std::string& hint = {}) {
+  if (!(t == u)) {
+    std::ostringstream os;
+    os << "Assertion failed: " << t << " != " << u;
+    if (!hint.empty()) {
+      os << " hint: " << hint;
+    }
+    throw std::runtime_error(os.str());
+  }
+}
 
-//inline void Assert(bool b, const std::string& hint) {
-//  AssertEqual(b, true, hint);
-//}
+inline void Assert(bool b, const std::string& hint) {
+  AssertEqual(b, true, hint);
+}
 
 class TestRunner {
 public:
