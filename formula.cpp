@@ -9,10 +9,6 @@
 
 using namespace std::literals;
 
-std::ostream& operator<<(std::ostream& output, FormulaError fe) {
-    return output << "#DIV/0!";
-}
-
 namespace {
 class Formula : public FormulaInterface {
 public:
@@ -22,11 +18,13 @@ public:
 
     }
     Value Evaluate() const override {
+        Value tmp;
         try {
-            return ast_.Execute();
+            tmp = ast_.Execute();
         }  catch (FormulaError& e) {
-            return e;
+            tmp = e;
         }
+        return tmp;
     }
     std::string GetExpression() const override {
         std::stringstream out;
