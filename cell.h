@@ -8,7 +8,7 @@ public:
     Cell();
     ~Cell();
 
-    void Set(std::string text);
+    void Set(std::string text) override;
     void Clear();
 
     Value GetValue() const override;
