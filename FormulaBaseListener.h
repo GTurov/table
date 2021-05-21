@@ -28,6 +28,9 @@ public:
   virtual void enterLiteral(FormulaParser::LiteralContext * /*ctx*/) override { }
   virtual void exitLiteral(FormulaParser::LiteralContext * /*ctx*/) override { }
 
+  virtual void enterCell(FormulaParser::CellContext * /*ctx*/) override { }
+  virtual void exitCell(FormulaParser::CellContext * /*ctx*/) override { }
+
   virtual void enterBinaryOp(FormulaParser::BinaryOpContext * /*ctx*/) override { }
   virtual void exitBinaryOp(FormulaParser::BinaryOpContext * /*ctx*/) override { }
 

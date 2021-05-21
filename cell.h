@@ -3,20 +3,24 @@
 #include "common.h"
 #include "formula.h"
 
+class Sheet;
+
 class Cell : public CellInterface {
 public:
-    Cell();
+    Cell(Sheet& sheet);
     ~Cell();
 
-    void Set(std::string text) override;
+    void Set(std::string text);
     void Clear();
 
     Value GetValue() const override;
     std::string GetText() const override;
+    std::vector<Position> GetReferencedCells() const override;
+
+    bool IsReferenced() const;
 
 private:
 
-//можете воспользоваться нашей подсказкой, но это необязательно.
     class Impl {
     public:
         virtual ~Impl() {}

@@ -13,7 +13,7 @@ class  FormulaParser : public antlr4::Parser {
 public:
   enum {
     T__0 = 1, T__1 = 2, NUMBER = 3, ADD = 4, SUB = 5, MUL = 6, DIV = 7, 
-    WS = 8
+    CELL = 8, WS = 9
   };
 
   enum {
@@ -85,6 +85,15 @@ public:
     LiteralContext(ExprContext *ctx);
 
     antlr4::tree::TerminalNode *NUMBER();
+    virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
+    virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
+  };
+
+  class  CellContext : public ExprContext {
+  public:
+    CellContext(ExprContext *ctx);
+
+    antlr4::tree::TerminalNode *CELL();
     virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
     virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
   };

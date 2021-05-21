@@ -13,7 +13,7 @@ class  FormulaLexer : public antlr4::Lexer {
 public:
   enum {
     T__0 = 1, T__1 = 2, NUMBER = 3, ADD = 4, SUB = 5, MUL = 6, DIV = 7, 
-    WS = 8
+    CELL = 8, WS = 9
   };
 
   explicit FormulaLexer(antlr4::CharStream *input);

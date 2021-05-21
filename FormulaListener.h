@@ -26,6 +26,9 @@ public:
   virtual void enterLiteral(FormulaParser::LiteralContext *ctx) = 0;
   virtual void exitLiteral(FormulaParser::LiteralContext *ctx) = 0;
 
+  virtual void enterCell(FormulaParser::CellContext *ctx) = 0;
+  virtual void exitCell(FormulaParser::CellContext *ctx) = 0;
+
   virtual void enterBinaryOp(FormulaParser::BinaryOpContext *ctx) = 0;
   virtual void exitBinaryOp(FormulaParser::BinaryOpContext *ctx) = 0;
 
