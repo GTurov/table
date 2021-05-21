@@ -4,6 +4,8 @@
 #include <sstream>
 #include <algorithm>
 
+using namespace std::literals;
+
 const int LETTERS = 26;
 const int MAX_POSITION_LENGTH = 17;
 const int MAX_POS_LETTER_COUNT = 3;
@@ -73,6 +75,31 @@ Position Position::FromString(std::string_view str) {
     return {row - 1, col - 1};
 }
 
-bool Size::operator==(Size rhs) const {
-    return cols == rhs.cols && rows == rhs.rows;
+//bool Size::operator==(Size rhs) const {
+//    return cols == rhs.cols && rows == rhs.rows;
+//}
+
+FormulaError::FormulaError(FormulaError::Category category)
+    : category_(category) {
+}
+
+FormulaError::Category FormulaError::GetCategory() const {
+    return category_;
+}
+
+bool FormulaError::operator==(FormulaError rhs) const {
+    return category_ == rhs.category_;
+}
+
+std::string_view FormulaError::ToString() const {
+    switch (category_) {
+    case FormulaError::Category::Ref: return "#DIV0!"sv; break;
+    case FormulaError::Category::Value: return "#VALUE!"sv; break;
+    case FormulaError::Category::Div0: return "#REF!"sv; break;
+    default: throw std::runtime_error("Something wrong");
+    }
+}
+
+std::ostream& operator<<(std::ostream& output, FormulaError fe) {
+    return output << fe.ToString();
 }

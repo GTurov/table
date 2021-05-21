@@ -78,8 +78,8 @@ private:
 
     class FormulaImpl : public Impl {
     public:
-        FormulaImpl(const std::string& text)
-            : formula_(ParseFormula(text.substr(1))) {
+        FormulaImpl(SheetInterface& sheet, const std::string& text)
+            : sheet_(dynamic_cast<SheetInterface&>(sheet)), formula_(ParseFormula(text.substr(1))) {
         }
         virtual void Set(std::string text) override {
             formula_ = ParseFormula(text);
@@ -89,11 +89,11 @@ private:
         }
 
         virtual Value GetValue() const override {
-            auto result = formula_->Evaluate();
+            auto result = formula_->Evaluate(sheet_);
             if (std::holds_alternative<double>(result)) {
                 return std::get<double>(result);
             } else {
-                return FormulaError("");
+                return std::get<FormulaError>(result);
             }
         }
 
@@ -101,9 +101,11 @@ private:
             return '=' + formula_->GetExpression();
         }
     private:
+        SheetInterface& sheet_;
         std::unique_ptr<FormulaInterface> formula_;
     };
 
+    Sheet& sheet_;
     std::unique_ptr<Impl> impl_;
 
 };

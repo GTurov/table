@@ -1,9 +1,10 @@
 #pragma once
 
-#include <stdexcept>
-#include <ostream>
-#include <variant>
 #include <memory>
+#include <ostream>
+#include <stdexcept>
+#include <variant>
+#include <vector>
 
 // Позиция ячейки. Индексация с нуля.
 struct Position {
@@ -104,9 +105,6 @@ public:
     // ячеек. В случае текстовой ячейки список пуст.
     virtual std::vector<Position> GetReferencedCells() const = 0;
 };
-
-inline constexpr char FORMULA_SIGN = '=';
-inline constexpr char ESCAPE_SIGN = '\'';
 
 // Интерфейс таблицы
 class SheetInterface {

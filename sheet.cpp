@@ -20,7 +20,7 @@ void Sheet::SetCell(Position pos, std::string text) {
         Resize({pos.row >= printableSize_.rows ? pos.row+1 : printableSize_.rows,
                 pos.col >= printableSize_.cols ? pos.col+1 : printableSize_.cols});
     }
-    cells_[pos.row][pos.col] = std::make_unique<Cell>();
+    cells_[pos.row][pos.col] = std::make_unique<Cell>(*this);
     cells_[pos.row][pos.col]->Set(text);
 }
 

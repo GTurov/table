@@ -1,4 +1,5 @@
 #include "cell.h"
+#include "sheet.h"
 
 #include <cassert>
 #include <iostream>
@@ -7,8 +8,8 @@
 
 
 // Реализуйте следующие методы
-Cell::Cell()
-    : impl_(std::make_unique<EmptyImpl>()){
+Cell::Cell(Sheet& sheet)
+    : sheet_(sheet), impl_(std::make_unique<EmptyImpl>()){
 }
 
 Cell::~Cell() {}
@@ -17,7 +18,7 @@ void Cell::Set(std::string text) {
     if (text != impl_->GetText()) {
         delete impl_.release();
         if (text.size() > 1 && text[0] == '=') {
-            impl_ = std::make_unique<FormulaImpl>(text);
+            impl_ = std::make_unique<FormulaImpl>(sheet_, text);
         } else {
             impl_ = std::make_unique<TextImpl>(text);
         }
@@ -35,4 +36,8 @@ Cell::Value Cell::GetValue() const {
 
 std::string Cell::GetText() const {
     return impl_->GetText();
+}
+
+std::vector<Position> Cell::GetReferencedCells() const {
+    return {};
 }
