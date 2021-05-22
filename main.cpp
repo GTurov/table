@@ -81,6 +81,7 @@ void TestClearCell() {
     sheet->ClearCell("A1"_pos);
     sheet->ClearCell("J10"_pos);
 }
+
 void TestPrint() {
     auto sheet = CreateSheet();
     sheet->SetCell("A2"_pos, "meow");
@@ -95,20 +96,131 @@ void TestPrint() {
 
     std::ostringstream values;
     sheet->PrintValues(values);
-    ASSERT_EQUAL(values.str(), "#DIV/0!\t\nmeow\t3\n");
+    ASSERT_EQUAL(values.str(), "#DIV0!\t\nmeow\t3\n");
 
     sheet->ClearCell("B2"_pos);
     ASSERT_EQUAL(sheet->GetPrintableSize(), (Size{2, 1}));
 }
 
+void TestExpressions() {
+    auto sheet = CreateSheet();
+    sheet->SetCell("A1"_pos, "1");
+    sheet->SetCell("B1"_pos, "2");
+    sheet->SetCell("C1"_pos, "=A1+B1");
+    sheet->SetCell("D1"_pos, "=C1+1");
+    sheet->SetCell("A2"_pos, "5");
+    sheet->SetCell("B2"_pos, "=B1/0");
+    sheet->SetCell("C2"_pos, "meow");
+    sheet->SetCell("D2"_pos, "=A2+1");
+    sheet->SetCell("A3"_pos, "'5");
+    sheet->SetCell("B3"_pos, "=B1+B2");
+    sheet->SetCell("C3"_pos, "=C1+C2");
+    sheet->SetCell("D3"_pos, "=A3+1");
+    sheet->SetCell("A4"_pos, "=C1-A2");
+    sheet->SetCell("B4"_pos, "=B3+1");
+    sheet->SetCell("C4"_pos, "=C3+1");
+    sheet->SetCell("D4"_pos, "=A2*B2");
+
+    std::ostringstream values;
+    sheet->PrintValues(values);
+
+    ASSERT_EQUAL(values.str(),
+                 "1\t2\t3\t4\n"
+                 "5\t#DIV0!\tmeow\t6\n"
+                 "5\t#DIV0!\t#VALUE!\t#VALUE!\n"
+                 "-2\t#DIV0!\t#VALUE!\t#DIV0!\n"
+                 );
+}
+
+void TestErrors() {
+    {
+        auto sheet = CreateSheet();
+        sheet->SetCell("A1"_pos, "1");
+        try {
+            sheet->SetCell("A2"_pos, "=A1+*");
+            ASSERT(false);
+        } catch (FormulaException& e) {
+
+        }
+    }
+
+    {
+        auto sheet = CreateSheet();
+        try {
+            sheet->SetCell("A1"_pos, "=ZZZ1+*");
+            ASSERT(false);
+        } catch (FormulaException& e) {
+
+        }
+    }
+
+    {
+        auto sheet = CreateSheet();
+        try {
+            sheet->SetCell("A1"_pos, "=A1");
+            ASSERT(false);
+        } catch (CircularDependencyException& e) {
+
+        }
+    }
+
+    {
+        auto sheet = CreateSheet();
+        try {
+            sheet->SetCell("A1"_pos, "=A1+100500");
+            ASSERT(false);
+        } catch (CircularDependencyException& e) {
+
+        }
+    }
+
+    {
+        auto sheet = CreateSheet();
+        try {
+            sheet->SetCell("A1"_pos, "=A2+1");
+            sheet->SetCell("A2"_pos, "=A1+1");
+            ASSERT(false);
+        } catch (CircularDependencyException& e) {
+
+        }
+    }
+
+    {
+        auto sheet = CreateSheet();
+        try {
+            sheet->SetCell("A1"_pos, "=B1+B2");
+            sheet->SetCell("B1"_pos, "=C1+C2+C3");
+            sheet->SetCell("B2"_pos, "=C3+C4+C5");
+            sheet->SetCell("C3"_pos, "=A1");
+            ASSERT(false);
+        } catch (CircularDependencyException& e) {
+
+        }
+    }
+}
+
+
+
 }  // namespace
 
 int main() {
+    auto sheet = CreateSheet();
+//    sheet->SetCell("A1"_pos, "1");
+//    sheet->SetCell("B1"_pos, "2");
+//    sheet->SetCell("C1"_pos, "=A1+*");
+//    sheet->SetCell("A1"_pos, "=ZZ1+1");
+//    sheet->SetCell("A1"_pos, "=B1+B2");
+//    sheet->SetCell("B1"_pos, "=C1+C2+C3");
+//    sheet->SetCell("B2"_pos, "=C3+C4+C5");
+//    sheet->SetCell("C3"_pos, "=A1");
+
     TestRunner tr;
     RUN_TEST(tr, TestEmpty);
     RUN_TEST(tr, TestInvalidPosition);
     RUN_TEST(tr, TestSetCellPlainText);
     RUN_TEST(tr, TestClearCell);
     RUN_TEST(tr, TestPrint);
+    RUN_TEST(tr, TestExpressions);
+    RUN_TEST(tr, TestErrors);
     return 0;
 }

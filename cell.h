@@ -3,11 +3,14 @@
 #include "common.h"
 #include "formula.h"
 
+#include <optional>
+#include <unordered_set>
+
 class Sheet;
 
 class Cell : public CellInterface {
 public:
-    Cell(Sheet& sheet);
+    Cell(Sheet& sheet, Position cellPosition);
     ~Cell();
 
     void Set(std::string text);
@@ -18,6 +21,14 @@ public:
     std::vector<Position> GetReferencedCells() const override;
 
     bool IsReferenced() const;
+
+    // можно передавать аргументом указатель на ячейку, и это будет работать быстрее,
+    // но для масштабируемости лучше передавать позицию
+    void RegisterAsDependent(const Position& pos) const;
+
+    void UnregisterAsDependent(const Position& pos) const;
+
+    void ResetCache() const;
 
 private:
 
@@ -100,12 +111,30 @@ private:
         virtual std::string GetText() const override {
             return '=' + formula_->GetExpression();
         }
+
+        std::vector<Position> GetReferencedCells() const {
+            return formula_->GetReferencedCells();
+        }
     private:
         SheetInterface& sheet_;
         std::unique_ptr<FormulaInterface> formula_;
     };
 
+    struct PositionHasher {
+        size_t operator()(Position pos) const {
+            return ((((size_t)pos.row<<16)&0xFFFF0000) | ((size_t)pos.col&0x0000FFFF));
+        }
+    };
+
+    void Unregister() const;
+    void Register() const;
+    bool IsIndependent(const std::vector<Position>& cellPositions);
+
     Sheet& sheet_;
+    Position ownPosition_;
     std::unique_ptr<Impl> impl_;
+    mutable std::optional<Value> cachedValue_;
+    mutable std::unordered_set<Position, PositionHasher> dependencesUp_;
+    std::vector<Position> dependencesDown_;
 
 };
