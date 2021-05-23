@@ -1,5 +1,6 @@
 #include "FormulaAST.h"
 
+#include "errors.h"
 #include "FormulaBaseListener.h"
 #include "FormulaLexer.h"
 #include "FormulaParser.h"

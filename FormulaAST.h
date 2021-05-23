@@ -1,7 +1,7 @@
 #pragma once
 
 #include "FormulaLexer.h"
-#include "common.h"
+#include "position.h"
 
 #include <forward_list>
 #include <functional>

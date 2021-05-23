@@ -1,4 +1,6 @@
-#include "common.h"
+#include "position.h"
+#include "sheet.h"
+#include "cell.h"
 #include "test_runner_p.h"
 
 inline std::ostream& operator<<(std::ostream& output, Position pos) {

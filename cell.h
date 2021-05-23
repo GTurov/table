@@ -1,12 +1,37 @@
 #pragma once
 
-#include "common.h"
 #include "formula.h"
+#include "position.h"
 
 #include <optional>
 #include <unordered_set>
 
 class Sheet;
+
+class CellInterface {
+public:
+    // Либо текст ячейки, либо значение формулы, либо сообщение об ошибке из
+    // формулы
+    using Value = std::variant<std::string, double, FormulaError>;
+
+    virtual ~CellInterface() = default;
+
+    // Возвращает видимое значение ячейки.
+    // В случае текстовой ячейки это её текст (без экранирующих символов). В
+    // случае формулы - числовое значение формулы или сообщение об ошибке.
+    virtual Value GetValue() const = 0;
+    // Возвращает внутренний текст ячейки, как если бы мы начали её
+    // редактирование. В случае текстовой ячейки это её текст (возможно,
+    // содержащий экранирующие символы). В случае формулы - её выражение.
+    virtual std::string GetText() const = 0;
+
+    // Возвращает список ячеек, которые непосредственно задействованы в данной
+    // формуле. Список отсортирован по возрастанию и не содержит повторяющихся
+    // ячеек. В случае текстовой ячейки список пуст.
+    virtual std::vector<Position> GetReferencedCells() const = 0;
+};
+
+
 
 class Cell : public CellInterface {
 public:
@@ -118,12 +143,6 @@ private:
     private:
         SheetInterface& sheet_;
         std::unique_ptr<FormulaInterface> formula_;
-    };
-
-    struct PositionHasher {
-        size_t operator()(Position pos) const {
-            return ((((size_t)pos.row<<16)&0xFFFF0000) | ((size_t)pos.col&0x0000FFFF));
-        }
     };
 
     void Unregister() const;

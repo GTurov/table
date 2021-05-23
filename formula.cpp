@@ -1,5 +1,6 @@
 #include "formula.h"
 
+#include "cell.h"
 #include "FormulaAST.h"
 
 #include <algorithm>

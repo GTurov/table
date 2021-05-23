@@ -1,7 +1,6 @@
 #include "sheet.h"
 
 #include "cell.h"
-#include "common.h"
 
 #include <algorithm>
 #include <functional>
@@ -20,8 +19,8 @@ void Sheet::SetCell(Position pos, std::string text) {
         Resize({pos.row >= printableSize_.rows ? pos.row+1 : printableSize_.rows,
                 pos.col >= printableSize_.cols ? pos.col+1 : printableSize_.cols});
     }
-    cells_[pos.row][pos.col] = std::make_unique<Cell>(*this, pos);
-    cells_[pos.row][pos.col]->Set(text);
+    cells_[pos] = std::make_unique<Cell>(*this, pos);
+    cells_[pos]->Set(text);
 }
 
 const CellInterface* Sheet::GetCell(Position pos) const {
@@ -29,7 +28,7 @@ const CellInterface* Sheet::GetCell(Position pos) const {
         throw InvalidPositionException("Invalid cell position"s);
     }
     if (pos.col < printableSize_.cols && pos.row < printableSize_.rows) {
-        return cells_[pos.row][pos.col].get();
+        return cells_.at(pos).get();
     } else {
         return nullptr;
     }
@@ -40,7 +39,7 @@ CellInterface* Sheet::GetCell(Position pos) {
         throw InvalidPositionException("Invalid cell position"s);
     }
     if (pos.col < printableSize_.cols && pos.row < printableSize_.rows) {
-        return cells_[pos.row][pos.col].get();
+        return cells_[pos].get();
     } else {
         return nullptr;
     }
@@ -51,8 +50,8 @@ void Sheet::ClearCell(Position pos) {
         throw InvalidPositionException("Invalid cell position"s);
     }
     if (const auto* cellPointer = GetCell(pos); cellPointer) {
-        cells_[pos.row][pos.col]->Clear();
-        delete cells_[pos.row][pos.col].release();
+        cells_[pos]->Clear();
+        delete cells_[pos].release();
         Squeeze();
     }
 }
@@ -62,14 +61,14 @@ Size Sheet::GetPrintableSize() const {
 }
 
 void Sheet::PrintValues(std::ostream& output) const {
-    for (auto& line: cells_) {
+    for (int i = 0; i < printableSize_.rows; ++i) {
         bool isFirstCell = true;
-        for (auto& cell: line) {
+        for (int j = 0; j < printableSize_.cols; ++j) {
             if (!isFirstCell) {
                 output << '\t';
             }
-            if (cell) {
-                PrintCellValue(cell.get(), output);
+            if (cells_.count({i,j}) != 0) {
+                PrintCellValue(cells_.at({i,j}).get(), output);
             }
             isFirstCell = false;
         }
@@ -78,14 +77,14 @@ void Sheet::PrintValues(std::ostream& output) const {
 }
 
 void Sheet::PrintTexts(std::ostream& output) const {
-    for (auto& line: cells_) {
+     for (int i = 0; i < printableSize_.rows; ++i) {
         bool isFirstCell = true;
-        for (auto& cell: line) {
+        for (int j = 0; j < printableSize_.cols; ++j) {
             if (!isFirstCell) {
                 output << '\t';
             }
-            if (cell) {
-                output<<cell->GetText();
+            if (cells_.count({i,j}) != 0) {
+                output<<cells_.at({i,j})->GetText();
             }
             isFirstCell = false;
         }
@@ -94,10 +93,6 @@ void Sheet::PrintTexts(std::ostream& output) const {
 }
 
 void Sheet::Resize(Size newSize) {
-    cells_.resize(newSize.rows);
-    for (auto& line: cells_) {
-        line.resize(newSize.cols);
-    }
     printableSize_ = newSize;
 }
 
@@ -105,7 +100,7 @@ void Sheet::Squeeze() {
     Size newPrintableSize = {0, 0};
     for (int i = 0; i < printableSize_.rows; ++i) {
         for (int j = 0; j < printableSize_.cols; ++j) {
-            if (cells_[i][j]) {
+            if (cells_[{i,j}]) {
                 if (i >= newPrintableSize.rows) {
                     newPrintableSize.rows = i+1;
                 }
